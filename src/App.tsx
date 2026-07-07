@@ -273,6 +273,7 @@ export default function App() {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const mimeTypeRef = useRef<string>('');
 
   // Clean up audio and timers on unmount
   useEffect(() => {
@@ -282,11 +283,33 @@ export default function App() {
     };
   }, [audioUrl]);
 
+  const getSupportedMimeType = () => {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/aac',
+      'audio/mpeg',
+      'audio/wav'
+    ];
+    for (const type of types) {
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type)) {
+        return type;
+      }
+    }
+    return '';
+  };
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      const chosenMimeType = getSupportedMimeType();
+      mimeTypeRef.current = chosenMimeType;
+      
+      const options = chosenMimeType ? { mimeType: chosenMimeType } : undefined;
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -296,7 +319,7 @@ export default function App() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeTypeRef.current || 'audio/webm' });
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
       };
