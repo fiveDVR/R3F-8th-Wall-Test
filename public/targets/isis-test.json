@@ -1,5 +1,5 @@
 {
-  "imagePath": "/targets/isis-test.png",
+  "imagePath": "/targets/isis-3-4.png",
   "metadata": null,
   "name": "isis-test",
   "type": "PLANAR",
@@ -7,17 +7,17 @@
     "left": 0,
     "top": 0,
     "width": 768,
-    "height": 1376,
+    "height": 1024,
     "isRotated": false,
     "originalWidth": 768,
-    "originalHeight": 1376
+    "originalHeight": 1024
   },
   "resources": {
-    "originalImage": "isis-test.png",
-    "croppedImage": "isis-test.png",
-    "thumbnailImage": "isis-test.png",
-    "luminanceImage": "isis-test.png"
+    "originalImage": "isis-test_original.png",
+    "croppedImage": "isis-test_cropped.png",
+    "thumbnailImage": "isis-test_thumbnail.png",
+    "luminanceImage": "isis-test_luminance.png"
   },
-  "created": 1783428178644,
-  "updated": 1783428178644
+  "created": 1783431258416,
+  "updated": 1783431258416
 }
