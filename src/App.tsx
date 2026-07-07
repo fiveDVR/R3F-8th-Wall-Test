@@ -68,13 +68,6 @@ export default function App() {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
-        
-        // Initialize HTMLAudioElement
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        audio.onended = () => {
-          setIsPlaying(false);
-        };
       };
 
       mediaRecorder.start();
@@ -107,21 +100,29 @@ export default function App() {
   };
 
   const togglePlayback = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !audioUrl) return;
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      if (audioRef.current.src !== audioUrl) {
+        audioRef.current.src = audioUrl;
+      }
+      audioRef.current.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(err => {
+          console.error('Audio playback failed:', err);
+        });
     }
   };
 
   const deleteRecording = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current = null;
+      audioRef.current.src = '';
     }
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
@@ -273,7 +274,7 @@ export default function App() {
           </div>
         </aside>
 
-        <footer className="w-full px-8 py-10 flex items-end justify-between bg-gradient-to-t from-black/80 to-transparent pointer-events-auto mt-auto">
+        <footer className="w-full px-8 pb-20 pt-10 flex items-end justify-between bg-gradient-to-t from-black/80 to-transparent pointer-events-auto mt-auto mb-6">
           <div className="flex flex-col gap-2">
             <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-widest">Active Model</span>
             <h2 className="text-2xl font-light text-white tracking-tight">Icosahedron Float</h2>
@@ -366,6 +367,14 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Hidden audio element for safe iOS Safari playback */}
+      <audio 
+        ref={audioRef} 
+        style={{ display: 'none' }} 
+        onEnded={() => setIsPlaying(false)} 
+        preload="auto"
+      />
     </div>
   );
 }
