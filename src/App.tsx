@@ -13,7 +13,7 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
       <directionalLight position={[10, 10, 5]} intensity={1.5} />
       
       <ImageTracker 
-        targetImage="/targets/isis-test.json"
+        targetImage="/targets/input2.json"
         onFound={onTargetFound}
         onLost={onTargetLost}
       >
@@ -268,7 +268,7 @@ export default function App() {
               <p className="text-[10px] text-zinc-400 leading-relaxed">
                 {targetFound 
                   ? '3D Icosahedron is anchored and rendering relative to the center of the image.'
-                  : 'Point your camera at the Isis goddess image target.'}
+                  : 'Point your camera at the input2 image target.'}
               </p>
             </div>
           </div>
@@ -359,10 +359,10 @@ export default function App() {
               </button>
             </div>
             <p className="text-[10px] text-zinc-400 text-center leading-relaxed">
-              This is the exact cropped 3:4 target. Point your camera at this image to activate the AR experience.
+              Point your camera at this image to activate the AR experience.
             </p>
             <div className="w-full aspect-[3/4] bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center">
-              <img src="/targets/isis-tracker.jpg" alt="Isis Target" className="w-full h-full object-contain" />
+              <img src="/targets/input2.png" alt="input2 Target" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>
