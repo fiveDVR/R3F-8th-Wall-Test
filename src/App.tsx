@@ -12,7 +12,7 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
       <directionalLight position={[10, 10, 5]} intensity={1.5} />
       
       <ImageTracker 
-        targetImage="/targets/image-ref.json"
+        targetImage="/targets/isis-test.json"
         onFound={onTargetFound}
         onLost={onTargetLost}
       >
@@ -148,13 +148,13 @@ export default function App() {
                   <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
                 )}
                 <p className={`text-xs font-semibold ${targetFound ? 'text-emerald-400' : 'text-amber-400'}`}>
-                  {targetFound ? 'Plane Detected' : 'Searching for plane...'}
+                  {targetFound ? 'Target Detected' : 'Searching for target...'}
                 </p>
               </div>
               <p className="text-[10px] text-zinc-400 leading-relaxed">
                 {targetFound 
-                  ? '3D Icosahedron is anchored and rendering relative to the center of the plane.'
-                  : 'Point your camera at the EgyptAir text or logo on the airplane fuselage.'}
+                  ? '3D Icosahedron is anchored and rendering relative to the center of the image.'
+                  : 'Point your camera at the Isis goddess image target.'}
               </p>
             </div>
           </div>

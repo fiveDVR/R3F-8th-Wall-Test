@@ -1,0 +1,23 @@
+{
+  "imagePath": "/targets/isis-test_luminance.png",
+  "metadata": null,
+  "name": "isis-test",
+  "type": "PLANAR",
+  "properties": {
+    "left": 0,
+    "top": 176,
+    "width": 768,
+    "height": 1024,
+    "isRotated": false,
+    "originalWidth": 768,
+    "originalHeight": 1376
+  },
+  "resources": {
+    "originalImage": "isis-test_original.png",
+    "croppedImage": "isis-test_cropped.png",
+    "thumbnailImage": "isis-test_thumbnail.png",
+    "luminanceImage": "isis-test_luminance.png"
+  },
+  "created": 1783428178644,
+  "updated": 1783428178644
+}
