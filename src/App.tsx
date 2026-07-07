@@ -4,10 +4,14 @@ import { Canvas } from '@react-three/fiber';
 import { useGLTF, useAnimations, OrbitControls } from '@react-three/drei';
 import { AlertCircle, Camera, CheckCircle2, Mic, Square, Play, Pause, Trash2, Volume2 } from 'lucide-react';
 import { useRef } from 'react';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 function Model({ url, position = [0, 0, 0] }: { url: string; position?: [number, number, number] }) {
+  const group = useRef<any>(null);
   const { scene, animations } = useGLTF(url);
-  const { ref, actions } = useAnimations(animations);
+  
+  const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
+  const { actions } = useAnimations(animations, group);
 
   useEffect(() => {
     const names = Object.keys(actions);
@@ -21,7 +25,7 @@ function Model({ url, position = [0, 0, 0] }: { url: string; position?: [number,
     }
   }, [actions]);
 
-  return <primitive ref={ref} object={scene} scale={0.0075} position={position} />;
+  return <primitive ref={group} object={clone} scale={0.0075} position={position} />;
 }
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
