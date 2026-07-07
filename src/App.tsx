@@ -12,7 +12,7 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
       <directionalLight position={[10, 10, 5]} intensity={1.5} />
       
       <ImageTracker 
-        targetImage="/targets/isis-test.json"
+        targetImage="/targets/input2.json"
         onFound={onTargetFound}
         onLost={onTargetLost}
       >
@@ -154,7 +154,7 @@ export default function App() {
               <p className="text-[10px] text-zinc-400 leading-relaxed">
                 {targetFound 
                   ? '3D Icosahedron is anchored and rendering relative to the center of the image.'
-                  : 'Point your camera at the Isis goddess image target.'}
+                  : 'Point your camera at the test target image (pig illustration).'}
               </p>
             </div>
           </div>
