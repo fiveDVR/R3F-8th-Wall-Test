@@ -5,7 +5,7 @@ import { useGLTF, useAnimations, OrbitControls } from '@react-three/drei';
 import { AlertCircle, Camera, CheckCircle2, Mic, Square, Play, Pause, Trash2, Volume2 } from 'lucide-react';
 import { useRef } from 'react';
 
-function Model({ url }: { url: string }) {
+function Model({ url, position = [0, 0, 0] }: { url: string; position?: [number, number, number] }) {
   const { scene, animations } = useGLTF(url);
   const { ref, actions } = useAnimations(animations);
 
@@ -21,7 +21,7 @@ function Model({ url }: { url: string }) {
     }
   }, [actions]);
 
-  return <primitive ref={ref} object={scene} scale={0.0075} position={[0, -0.5, 0]} />;
+  return <primitive ref={ref} object={scene} scale={0.0075} position={position} />;
 }
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
@@ -83,26 +83,27 @@ function ARUIOverlay({
 
   if (!arStarted) {
     return (
-      <div className="absolute inset-0 z-50 bg-[#050505] text-slate-200 overflow-hidden select-none flex flex-col justify-between">
+      <div className="absolute inset-0 z-50 bg-[#bae6fd] text-slate-800 overflow-hidden select-none flex flex-col justify-between">
         {/* 3D Model Preview Canvas */}
         <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 2.2], fov: 45 }}>
+            <color attach="background" args={['#bae6fd']} />
             <ambientLight intensity={1.5} />
             <directionalLight position={[5, 10, 5]} intensity={2.0} />
             <directionalLight position={[-5, 5, -5]} intensity={1.0} />
             <pointLight position={[0, 4, 2]} intensity={1.5} />
             <React.Suspense fallback={null}>
-              <Model url="/resources/Hip-Hop.glb" />
+              <Model url="/resources/Hip-Hop.glb" position={[0, -0.5, 0]} />
             </React.Suspense>
             <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.5} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI / 2} />
           </Canvas>
         </div>
 
         {/* Diagonal viewport corners */}
-        <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-white/20 pointer-events-none z-10"></div>
-        <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-white/20 pointer-events-none z-10"></div>
-        <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/20 pointer-events-none z-10"></div>
-        <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/20 pointer-events-none z-10"></div>
+        <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-slate-400/40 pointer-events-none z-10"></div>
+        <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-slate-400/40 pointer-events-none z-10"></div>
+        <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-slate-400/40 pointer-events-none z-10"></div>
+        <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-slate-400/40 pointer-events-none z-10"></div>
 
         {/* Start Experience Button Overlay */}
         <div className="relative w-full h-full flex flex-col items-center justify-end pb-24 px-8 z-10 pointer-events-none">
