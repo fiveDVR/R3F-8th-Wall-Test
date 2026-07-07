@@ -140,19 +140,7 @@ export default function App() {
   };
 
   const startAR = async () => {
-    // 1. Request iOS motion sensor permission if available (requires user gesture)
-    if (typeof window !== 'undefined' && 
-        typeof (window as any).DeviceMotionEvent !== 'undefined' && 
-        typeof (window as any).DeviceMotionEvent.requestPermission === 'function') {
-      try {
-        const state = await (window as any).DeviceMotionEvent.requestPermission();
-        console.log('Motion permission:', state);
-      } catch (err) {
-        console.error('Error requesting motion permission:', err);
-      }
-    }
-
-    // 2. Request camera permission
+    // Request camera permission
     setArStarted(true);
     try {
       const granted = await permissionRequest();
