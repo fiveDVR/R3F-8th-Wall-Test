@@ -29,7 +29,6 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
 
 export default function App() {
   const [permission, setPermission] = useState<boolean | null>(null);
-  const [arStarted, setArStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [targetFound, setTargetFound] = useState(false);
   const [showTargetModal, setShowTargetModal] = useState(false);
@@ -139,27 +138,20 @@ export default function App() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const startAR = async () => {
-    // Request camera permission
-    setArStarted(true);
-    try {
-      const granted = await permissionRequest();
-      setPermission(granted);
-      if (!granted) {
-        setArStarted(false);
-      }
-    } catch (err: any) {
-      setError(`Permission error: ${err?.message || String(err)}`);
-      setArStarted(false);
-    }
-  };
-
   useEffect(() => {
-    // Check compatibility on load
+    // 1. Check compatibility
     const compat = checkBrowserCompatibility();
     if (!compat.compatible) {
       setError(`Browser incompatible: ${(compat.issues || []).join(', ')}`);
+      return;
     }
+
+    // 2. Request permission (must be done before mounting canvas)
+    permissionRequest().then((granted: boolean) => {
+      setPermission(granted);
+    }).catch((err: any) => {
+      setError(`Permission error: ${err?.message || String(err)}`);
+    });
   }, []);
 
   if (error) {
@@ -172,49 +164,6 @@ export default function App() {
           <div className="mt-4 text-xs text-slate-500 text-left bg-black/40 p-3 rounded">
             <strong>Note:</strong> Ensure you are running this over HTTPS and your device supports WebXR/Camera access.
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!arStarted) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-[#050505] text-slate-200 relative overflow-hidden select-none">
-        {/* Glowing background shapes */}
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-purple-600/10 blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 rounded-full bg-cyan-600/10 blur-[120px] pointer-events-none"></div>
-
-        {/* Diagonal viewport corners */}
-        <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-white/20 pointer-events-none"></div>
-        <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-white/20 pointer-events-none"></div>
-        <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/20 pointer-events-none"></div>
-        <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/20 pointer-events-none"></div>
-
-        <div className="max-w-md w-full p-8 mx-4 bg-zinc-950/40 border border-white/10 rounded-3xl backdrop-blur-2xl text-center shadow-2xl flex flex-col items-center gap-6">
-          <div className="relative w-20 h-20 bg-white/5 border border-white/15 rounded-2xl flex items-center justify-center shadow-inner">
-            <Camera className="w-10 h-10 text-purple-400" />
-            <div className="absolute -inset-0.5 border border-purple-500/30 rounded-2xl animate-pulse pointer-events-none"></div>
-          </div>
-
-          <div className="space-y-2">
-            <h1 className="text-xl font-bold tracking-[0.2em] uppercase text-white">
-              AR WORKSPACE
-            </h1>
-            <p className="text-xs text-zinc-400 leading-relaxed max-w-[280px] mx-auto">
-              Place interactive 3D assets in your space. Works with image targets.
-            </p>
-          </div>
-
-          <button
-            onClick={startAR}
-            className="w-full py-4 px-6 bg-white text-black font-semibold text-xs tracking-widest uppercase rounded-2xl hover:bg-zinc-200 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2"
-          >
-            <span>Start Experience</span>
-          </button>
-
-          <p className="text-[10px] text-zinc-500 max-w-[240px] leading-relaxed">
-            Note: On iOS, this requires accepting both Camera and Motion Sensor permissions.
-          </p>
         </div>
       </div>
     );
