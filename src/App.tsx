@@ -131,45 +131,33 @@ function ARUIOverlay({
             <Camera className="w-3.5 h-3.5 text-purple-400" />
             VIEW TARGET IMAGE
           </button>
-          <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[11px] font-medium backdrop-blur-md flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${targetFound ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
-            {targetFound ? 'TARGET DETECTED' : 'SEARCHING FOR TARGET'}
-          </div>
         </div>
       </header>
 
-      {/* HUD Sidebar - Left (Info) */}
-      <aside className="w-64 mt-8 ml-8 flex flex-col gap-6 pointer-events-auto">
-        <div className="p-5 bg-black/40 border border-white/10 rounded-2xl backdrop-blur-xl">
-          <h3 className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-4">Tracking Status</h3>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-3">
-              {targetFound ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 animate-bounce" />
-              ) : (
-                <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
-              )}
-              <p className={`text-xs font-semibold ${targetFound ? 'text-emerald-400' : 'text-amber-400'}`}>
-                {targetFound ? 'Target Detected' : 'Searching for target...'}
-              </p>
-            </div>
-            <p className="text-[10px] text-zinc-400 leading-relaxed">
-              {targetFound 
-                ? '3D Icosahedron is anchored and rendering relative to the center of the image.'
-                : 'Point your camera at the input2 image target.'}
-            </p>
-          </div>
+      {/* Center Image Target Overlay */}
+      <div 
+        className={`absolute inset-0 z-0 flex items-center justify-center pointer-events-none transition-all duration-700 ease-in-out ${
+          targetFound ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+        }`}
+      >
+        <div className="relative w-64 h-64 border-2 border-dashed border-white/20 rounded-3xl p-6 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
+          {/* Scanning frame corners */}
+          <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-white/50"></div>
+          <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-white/50"></div>
+          <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-white/50"></div>
+          <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-white/50"></div>
+          
+          <img 
+            src="/targets/input2.png" 
+            alt="Align target" 
+            className="w-full h-full object-contain opacity-35 animate-pulse pointer-events-none" 
+            style={{ animationDuration: '2.5s' }}
+          />
         </div>
-      </aside>
+      </div>
 
       <footer className="w-full px-8 pb-20 pt-10 flex items-end justify-between bg-gradient-to-t from-black/80 to-transparent pointer-events-auto mt-auto mb-6">
-        <div className="flex flex-col gap-2">
-          <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-widest">Active Model</span>
-          <h2 className="text-2xl font-light text-white tracking-tight">Icosahedron Float</h2>
-          <div className="flex gap-2 mt-2">
-            <span className="px-2 py-1 bg-white/10 rounded text-[9px] font-bold text-white">MESH DISTORT</span>
-          </div>
-        </div>
+        <div></div>
 
         <div className="flex items-center gap-4">
           {/* Recording State HUD */}
