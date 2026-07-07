@@ -3,7 +3,7 @@ import { EighthwallCanvas, EighthwallCamera, ImageTracker, permissionRequest, ch
 import { Float, Icosahedron, MeshDistortMaterial } from '@react-three/drei';
 import { AlertCircle, Camera, CheckCircle2 } from 'lucide-react';
 
-function ARContent() {
+function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
   return (
     <>
       <EighthwallCamera />
@@ -13,8 +13,8 @@ function ARContent() {
       
       <ImageTracker 
         targetImage="/targets/image-ref.json"
-        onFound={() => console.log('Image target found!')}
-        onLost={() => console.log('Image target lost!')}
+        onFound={onTargetFound}
+        onLost={onTargetLost}
       >
         <Float speed={2} rotationIntensity={1.5} floatIntensity={2} position={[0, 0.2, 0]}>
           <Icosahedron args={[0.2, 4]}>
@@ -29,6 +29,7 @@ function ARContent() {
 export default function App() {
   const [permission, setPermission] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [targetFound, setTargetFound] = useState(false);
 
   useEffect(() => {
     // 1. Check compatibility
@@ -98,7 +99,16 @@ export default function App() {
           style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
           onError={(err: any) => setError(err?.message || String(err))}
         >
-          <ARContent />
+          <ARContent 
+            onTargetFound={() => {
+              console.log('Image target found!');
+              setTargetFound(true);
+            }} 
+            onTargetLost={() => {
+              console.log('Image target lost!');
+              setTargetFound(false);
+            }} 
+          />
         </EighthwallCanvas>
       </div>
 
@@ -120,8 +130,8 @@ export default function App() {
           </div>
           <div className="flex gap-3">
             <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[11px] font-medium backdrop-blur-md flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-              TRACKING ACTIVE
+              <span className={`w-2 h-2 rounded-full ${targetFound ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
+              {targetFound ? 'TARGET DETECTED' : 'SEARCHING FOR TARGET'}
             </div>
           </div>
         </header>
@@ -129,14 +139,22 @@ export default function App() {
         {/* HUD Sidebar - Left (Info) */}
         <aside className="w-64 mt-8 ml-8 flex flex-col gap-6 pointer-events-auto">
           <div className="p-5 bg-black/40 border border-white/10 rounded-2xl backdrop-blur-xl">
-            <h3 className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-4">Experience Status</h3>
+            <h3 className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-4">Tracking Status</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-3">
-                <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                <p className="text-xs font-semibold text-white">Experience Ready</p>
+                {targetFound ? (
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 animate-bounce" />
+                ) : (
+                  <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                )}
+                <p className={`text-xs font-semibold ${targetFound ? 'text-emerald-400' : 'text-amber-400'}`}>
+                  {targetFound ? 'Plane Detected' : 'Searching for plane...'}
+                </p>
               </div>
               <p className="text-[10px] text-zinc-400 leading-relaxed">
-                Move your device to look around. If the AR stream is missing, ensure you have placed your valid <code className="bg-white/10 text-cyan-300 px-1.5 py-0.5 rounded font-mono">xr.js</code> engine file in the <code>/public</code> directory.
+                {targetFound 
+                  ? '3D Icosahedron is anchored and rendering relative to the center of the plane.'
+                  : 'Point your camera at the EgyptAir text or logo on the airplane fuselage.'}
               </p>
             </div>
           </div>
