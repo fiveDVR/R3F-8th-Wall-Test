@@ -13,7 +13,7 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
       <directionalLight position={[10, 10, 5]} intensity={1.5} />
       
       <ImageTracker 
-        targetImage="/targets/input2.json"
+        targetImage="/targets/isis.json"
         onFound={onTargetFound}
         onLost={onTargetLost}
       >
@@ -31,8 +31,6 @@ function ARUIOverlay({
   arStarted,
   setArStarted,
   targetFound,
-  showTargetModal,
-  setShowTargetModal,
   isRecording,
   recordingSeconds,
   audioUrl,
@@ -124,13 +122,6 @@ function ARUIOverlay({
           </div>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => setShowTargetModal(true)}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[11px] font-medium backdrop-blur-md flex items-center gap-2 pointer-events-auto transition-all active:scale-95 text-white"
-          >
-            <Camera className="w-3.5 h-3.5 text-purple-400" />
-            VIEW TARGET IMAGE
-          </button>
         </div>
       </header>
 
@@ -140,7 +131,7 @@ function ARUIOverlay({
           targetFound ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}
       >
-        <div className="relative w-64 h-64 border-2 border-dashed border-white/20 rounded-3xl p-6 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
+        <div className="relative w-48 h-80 border-2 border-dashed border-white/20 rounded-3xl p-4 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
           {/* Scanning frame corners */}
           <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-white/50"></div>
           <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-white/50"></div>
@@ -148,7 +139,7 @@ function ARUIOverlay({
           <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-white/50"></div>
           
           <img 
-            src="/targets/input2.png" 
+            src="/targets/isis.jpg" 
             alt="Align target" 
             className="w-full h-full object-contain opacity-35 animate-pulse pointer-events-none" 
             style={{ animationDuration: '2.5s' }}
@@ -219,29 +210,6 @@ function ARUIOverlay({
       <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-white/30 z-20 pointer-events-none"></div>
       <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/30 z-20 pointer-events-none"></div>
       <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/30 z-20 pointer-events-none"></div>
-
-      {/* Target Image Modal Overlay */}
-      {showTargetModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 pointer-events-auto">
-          <div className="max-w-sm w-full p-6 bg-zinc-950/90 border border-white/10 rounded-3xl shadow-2xl flex flex-col items-center gap-4">
-            <div className="w-full flex justify-between items-center border-b border-white/5 pb-3">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase">Target Image</h3>
-              <button 
-                onClick={() => setShowTargetModal(false)}
-                className="text-zinc-400 hover:text-white transition-colors text-[10px] font-mono uppercase px-2.5 py-1 bg-white/5 rounded-lg border border-white/5 active:scale-95"
-              >
-                Close
-              </button>
-            </div>
-            <p className="text-[10px] text-zinc-400 text-center leading-relaxed">
-              Point your camera at this image to activate the AR experience.
-            </p>
-            <div className="w-full aspect-[3/4] bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center">
-              <img src="/targets/input2.png" alt="input2 Target" className="w-full h-full object-contain" />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -250,7 +218,6 @@ export default function App() {
   const [arStarted, setArStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [targetFound, setTargetFound] = useState(false);
-  const [showTargetModal, setShowTargetModal] = useState(false);
 
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
@@ -417,8 +384,6 @@ export default function App() {
               arStarted={arStarted}
               setArStarted={setArStarted}
               targetFound={targetFound}
-              showTargetModal={showTargetModal}
-              setShowTargetModal={setShowTargetModal}
               isRecording={isRecording}
               recordingSeconds={recordingSeconds}
               audioUrl={audioUrl}

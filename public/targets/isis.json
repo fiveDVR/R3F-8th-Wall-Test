@@ -1,0 +1,23 @@
+{
+  "imagePath": "/targets/isis.jpg",
+  "name": "isis",
+  "type": "PLANAR",
+  "properties": {
+    "top": 0,
+    "left": 0,
+    "width": 768,
+    "height": 1376,
+    "isRotated": false,
+    "originalWidth": 768,
+    "originalHeight": 1376
+  },
+  "resources": {
+    "croppedImage": "isis.jpg",
+    "thumbnailImage": "isis.jpg",
+    "luminanceImage": "isis.jpg"
+  },
+  "userMetadataIsJson": true,
+  "loadAutomatically": false,
+  "created": 1710738000000,
+  "updated": 1710738000000
+}
