@@ -361,7 +361,7 @@ export default function App() {
               This is the exact cropped 3:4 target. Point your camera at this image to activate the AR experience.
             </p>
             <div className="w-full aspect-[3/4] bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center">
-              <img src="/targets/isis-3-4.png" alt="Isis Target" className="w-full h-full object-contain" />
+              <img src="/targets/isis-tracker.jpg" alt="Isis Target" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>
