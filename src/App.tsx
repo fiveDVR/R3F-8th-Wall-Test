@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { EighthwallCanvas, EighthwallCamera, ImageTracker, permissionRequest, checkBrowserCompatibility } from '@j1ngzoue/8thwall-react-three-fiber';
 import { Float, Icosahedron, MeshDistortMaterial } from '@react-three/drei';
-import { AlertCircle, Camera, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Camera, CheckCircle2, Mic, Square, Play, Pause, Trash2, Volume2 } from 'lucide-react';
+import { useRef } from 'react';
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
   return (
@@ -30,6 +31,110 @@ export default function App() {
   const [permission, setPermission] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [targetFound, setTargetFound] = useState(false);
+
+  // Recording State
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up audio and timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioUrl(url);
+        
+        // Initialize HTMLAudioElement
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        audio.onended = () => {
+          setIsPlaying(false);
+        };
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingSeconds(0);
+
+      // Start duration timer
+      timerRef.current = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
+
+    } catch (err) {
+      console.error('Failed to start recording:', err);
+      alert('Could not access microphone. Please allow access.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      // Stop all tracks on the stream to release the mic
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+      setIsRecording(false);
+
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const deleteRecording = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+    }
+    setAudioUrl(null);
+    setIsPlaying(false);
+    setRecordingSeconds(0);
+  };
+
+  const formatTime = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     // 1. Check compatibility
@@ -167,6 +272,60 @@ export default function App() {
             <div className="flex gap-2 mt-2">
               <span className="px-2 py-1 bg-white/10 rounded text-[9px] font-bold text-white">MESH DISTORT</span>
             </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Recording State HUD */}
+            {isRecording && (
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-red-950/40 border border-red-500/30 rounded-2xl backdrop-blur-xl">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                <span className="text-xs font-mono font-bold text-red-400">{formatTime(recordingSeconds)}</span>
+                <span className="text-[10px] uppercase tracking-wider text-red-300 font-medium">Recording...</span>
+              </div>
+            )}
+
+            {/* Audio Playback Controls */}
+            {audioUrl && (
+              <div className="flex items-center gap-2.5 p-2.5 bg-zinc-900/60 border border-white/10 rounded-2xl backdrop-blur-xl">
+                <button
+                  onClick={togglePlayback}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-purple-500 hover:bg-purple-600 active:scale-95 text-white transition-all shadow-[0_0_12px_rgba(139,92,246,0.3)]"
+                >
+                  {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
+                </button>
+                <div className="flex flex-col pr-2">
+                  <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Voice Note</span>
+                  <span className="text-[11px] text-white font-medium flex items-center gap-1.5">
+                    <Volume2 className="w-3.5 h-3.5 text-purple-400" /> Recorded Audio
+                  </span>
+                </div>
+                <button
+                  onClick={deleteRecording}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 hover:bg-red-500/10 hover:text-red-400 text-zinc-400 transition-all active:scale-95 border border-white/5"
+                  title="Delete recording"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Microphone Trigger Button */}
+            {!audioUrl && (
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`w-14 h-14 flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 border ${
+                  isRecording 
+                    ? 'bg-red-500 hover:bg-red-600 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] animate-pulse' 
+                    : 'bg-white/5 hover:bg-white/10 border-white/15 text-white backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.05)]'
+                }`}
+              >
+                {isRecording ? (
+                  <Square className="w-5 h-5 fill-white text-white" />
+                ) : (
+                  <Mic className="w-6 h-6 text-white" />
+                )}
+              </button>
+            )}
           </div>
         </footer>
 
