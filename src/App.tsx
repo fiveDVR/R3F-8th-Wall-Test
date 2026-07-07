@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EighthwallCanvas, EighthwallCamera, permissionRequest, checkBrowserCompatibility } from '@j1ngzoue/8thwall-react-three-fiber';
+import { EighthwallCanvas, EighthwallCamera, ImageTracker, permissionRequest, checkBrowserCompatibility } from '@j1ngzoue/8thwall-react-three-fiber';
 import { Float, Icosahedron, MeshDistortMaterial } from '@react-three/drei';
 import { AlertCircle, Camera, CheckCircle2 } from 'lucide-react';
 
@@ -11,11 +11,17 @@ function ARContent() {
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1.5} />
       
-      <Float speed={2} rotationIntensity={1.5} floatIntensity={2} position={[0, 1.5, -3]}>
-        <Icosahedron args={[0.5, 4]}>
-          <MeshDistortMaterial color="#8b5cf6" distort={0.4} speed={2} roughness={0.1} metalness={0.8} />
-        </Icosahedron>
-      </Float>
+      <ImageTracker 
+        targetImage="/targets/image-ref.json"
+        onFound={() => console.log('Image target found!')}
+        onLost={() => console.log('Image target lost!')}
+      >
+        <Float speed={2} rotationIntensity={1.5} floatIntensity={2} position={[0, 0.2, 0]}>
+          <Icosahedron args={[0.2, 4]}>
+            <MeshDistortMaterial color="#8b5cf6" distort={0.4} speed={2} roughness={0.1} metalness={0.8} />
+          </Icosahedron>
+        </Float>
+      </ImageTracker>
     </>
   );
 }
