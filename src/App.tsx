@@ -1,8 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { EighthwallCanvas, EighthwallCamera, ImageTracker, checkBrowserCompatibility, useXRContext } from '@j1ngzoue/8thwall-react-three-fiber';
-import { Float, Icosahedron, MeshDistortMaterial } from '@react-three/drei';
+import { useGLTF, useAnimations } from '@react-three/drei';
 import { AlertCircle, Camera, CheckCircle2, Mic, Square, Play, Pause, Trash2, Volume2 } from 'lucide-react';
 import { useRef } from 'react';
+
+function Model({ url }: { url: string }) {
+  const { scene, animations } = useGLTF(url);
+  const { ref, actions } = useAnimations(animations);
+
+  useEffect(() => {
+    const names = Object.keys(actions);
+    if (names.length > 0) {
+      console.log('Available animations:', names);
+      const firstAction = actions[names[0]];
+      firstAction?.reset().fadeIn(0.5).play();
+      return () => {
+        firstAction?.fadeOut(0.5);
+      };
+    }
+  }, [actions]);
+
+  return <primitive ref={ref} object={scene} scale={0.4} position={[0, 0, 0]} />;
+}
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
   return (
@@ -17,11 +36,9 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
         onFound={onTargetFound}
         onLost={onTargetLost}
       >
-        <Float speed={2} rotationIntensity={1.5} floatIntensity={2} position={[0, 0.2, 0]}>
-          <Icosahedron args={[0.2, 4]}>
-            <MeshDistortMaterial color="#8b5cf6" distort={0.4} speed={2} roughness={0.1} metalness={0.8} />
-          </Icosahedron>
-        </Float>
+        <React.Suspense fallback={null}>
+          <Model url="/resources/Hip-Hop.glb" />
+        </React.Suspense>
       </ImageTracker>
     </>
   );
