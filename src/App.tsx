@@ -20,7 +20,7 @@ function Model({ url }: { url: string }) {
     }
   }, [actions]);
 
-  return <primitive ref={ref} object={scene} scale={0.015} position={[0, 0, 0]} />;
+  return <primitive ref={ref} object={scene} scale={0.0075} position={[0, 0, 0]} />;
 }
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
@@ -28,8 +28,10 @@ function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void,
     <>
       <EighthwallCamera />
       
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1.5} />
+      <ambientLight intensity={1.5} />
+      <directionalLight position={[5, 10, 5]} intensity={2.0} />
+      <directionalLight position={[-5, 5, -5]} intensity={1.0} />
+      <pointLight position={[0, 4, 2]} intensity={1.5} />
       
       <ImageTracker 
         targetImage="/targets/isis.json"
