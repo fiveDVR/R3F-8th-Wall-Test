@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Google AI Studio App</title>
+    <!-- Preload 8th Wall engine to prevent race conditions during React initialization -->
+    <script src="/xr.js" data-preload-chunks="slam"></script>
   </head>
   <body>
     <div id="root"></div>
