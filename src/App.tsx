@@ -20,7 +20,7 @@ function Model({ url }: { url: string }) {
     }
   }, [actions]);
 
-  return <primitive ref={ref} object={scene} scale={0.4} position={[0, 0, 0]} />;
+  return <primitive ref={ref} object={scene} scale={0.1} position={[0, 0, 0]} />;
 }
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
