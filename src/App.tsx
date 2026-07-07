@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EighthwallCanvas, EighthwallCamera, ImageTracker, checkBrowserCompatibility, useXRContext } from '@j1ngzoue/8thwall-react-three-fiber';
-import { useGLTF, useAnimations } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { useGLTF, useAnimations, OrbitControls } from '@react-three/drei';
 import { AlertCircle, Camera, CheckCircle2, Mic, Square, Play, Pause, Trash2, Volume2 } from 'lucide-react';
 import { useRef } from 'react';
 
@@ -20,7 +21,7 @@ function Model({ url }: { url: string }) {
     }
   }, [actions]);
 
-  return <primitive ref={ref} object={scene} scale={0.0075} position={[0, 0, 0]} />;
+  return <primitive ref={ref} object={scene} scale={0.0075} position={[0, -0.5, 0]} />;
 }
 
 function ARContent({ onTargetFound, onTargetLost }: { onTargetFound: () => void, onTargetLost: () => void }) {
@@ -82,43 +83,38 @@ function ARUIOverlay({
 
   if (!arStarted) {
     return (
-      <div className="absolute inset-0 z-50 flex h-full w-full items-center justify-center bg-[#050505] text-slate-200 overflow-hidden select-none">
-        {/* Glowing background shapes */}
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-purple-600/10 blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 rounded-full bg-cyan-600/10 blur-[120px] pointer-events-none"></div>
+      <div className="absolute inset-0 z-50 bg-[#050505] text-slate-200 overflow-hidden select-none flex flex-col justify-between">
+        {/* 3D Model Preview Canvas */}
+        <div className="absolute inset-0 z-0">
+          <Canvas camera={{ position: [0, 0, 2.2], fov: 45 }}>
+            <ambientLight intensity={1.5} />
+            <directionalLight position={[5, 10, 5]} intensity={2.0} />
+            <directionalLight position={[-5, 5, -5]} intensity={1.0} />
+            <pointLight position={[0, 4, 2]} intensity={1.5} />
+            <React.Suspense fallback={null}>
+              <Model url="/resources/Hip-Hop.glb" />
+            </React.Suspense>
+            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.5} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI / 2} />
+          </Canvas>
+        </div>
 
         {/* Diagonal viewport corners */}
-        <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-white/20 pointer-events-none"></div>
-        <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-white/20 pointer-events-none"></div>
-        <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/20 pointer-events-none"></div>
-        <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/20 pointer-events-none"></div>
+        <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-white/20 pointer-events-none z-10"></div>
+        <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-white/20 pointer-events-none z-10"></div>
+        <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/20 pointer-events-none z-10"></div>
+        <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/20 pointer-events-none z-10"></div>
 
-        <div className="max-w-md w-full p-8 mx-4 bg-zinc-950/40 border border-white/10 rounded-3xl backdrop-blur-2xl text-center shadow-2xl flex flex-col items-center gap-6">
-          <div className="relative w-20 h-20 bg-white/5 border border-white/15 rounded-2xl flex items-center justify-center shadow-inner">
-            <Camera className="w-10 h-10 text-purple-400 animate-pulse" />
-            <div className="absolute -inset-0.5 border border-purple-500/30 rounded-2xl pointer-events-none"></div>
+        {/* Start Experience Button Overlay */}
+        <div className="relative w-full h-full flex flex-col items-center justify-end pb-24 px-8 z-10 pointer-events-none">
+          <div className="max-w-md w-full p-4 bg-zinc-950/40 border border-white/10 rounded-3xl backdrop-blur-md shadow-2xl pointer-events-auto">
+            <button
+              onClick={handleStart}
+              disabled={isStarting}
+              className="w-full py-4 px-6 bg-white text-black font-semibold text-xs tracking-widest uppercase rounded-2xl hover:bg-zinc-200 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2 pointer-events-auto font-bold"
+            >
+              <span>{isStarting ? 'Starting...' : 'Start Experience'}</span>
+            </button>
           </div>
-
-          <div className="space-y-2">
-            <h1 className="text-xl font-bold tracking-[0.2em] uppercase text-white">
-              AR WORKSPACE
-            </h1>
-            <p className="text-xs text-zinc-400 leading-relaxed max-w-[280px] mx-auto">
-              Place interactive 3D assets in your space. Works with image targets.
-            </p>
-          </div>
-
-          <button
-            onClick={handleStart}
-            disabled={isStarting}
-            className="w-full py-4 px-6 bg-white text-black font-semibold text-xs tracking-widest uppercase rounded-2xl hover:bg-zinc-200 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2 pointer-events-auto font-bold"
-          >
-            <span>{isStarting ? 'Starting...' : 'Start Experience'}</span>
-          </button>
-
-          <p className="text-[10px] text-zinc-500 max-w-[240px] leading-relaxed font-mono">
-            Note: On iOS, this requires camera access.
-          </p>
         </div>
       </div>
     );
