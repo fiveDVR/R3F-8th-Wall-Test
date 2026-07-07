@@ -31,6 +31,7 @@ export default function App() {
   const [permission, setPermission] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [targetFound, setTargetFound] = useState(false);
+  const [showTargetModal, setShowTargetModal] = useState(false);
 
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
@@ -234,6 +235,13 @@ export default function App() {
             </div>
           </div>
           <div className="flex gap-3">
+            <button
+              onClick={() => setShowTargetModal(true)}
+              className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[11px] font-medium backdrop-blur-md flex items-center gap-2 pointer-events-auto transition-all active:scale-95 text-white"
+            >
+              <Camera className="w-3.5 h-3.5 text-purple-400" />
+              VIEW TARGET IMAGE
+            </button>
             <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[11px] font-medium backdrop-blur-md flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${targetFound ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
               {targetFound ? 'TARGET DETECTED' : 'SEARCHING FOR TARGET'}
@@ -335,6 +343,29 @@ export default function App() {
         <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/30 z-20 pointer-events-none"></div>
         <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/30 z-20 pointer-events-none"></div>
       </div>
+
+      {/* Target Image Modal Overlay */}
+      {showTargetModal && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 pointer-events-auto">
+          <div className="max-w-sm w-full p-6 bg-zinc-950/90 border border-white/10 rounded-3xl shadow-2xl flex flex-col items-center gap-4">
+            <div className="w-full flex justify-between items-center border-b border-white/5 pb-3">
+              <h3 className="text-xs font-bold text-white tracking-widest uppercase">Target Image</h3>
+              <button 
+                onClick={() => setShowTargetModal(false)}
+                className="text-zinc-400 hover:text-white transition-colors text-[10px] font-mono uppercase px-2.5 py-1 bg-white/5 rounded-lg border border-white/5 active:scale-95"
+              >
+                Close
+              </button>
+            </div>
+            <p className="text-[10px] text-zinc-400 text-center leading-relaxed">
+              This is the exact cropped 3:4 target. Point your camera at this image to activate the AR experience.
+            </p>
+            <div className="w-full aspect-[3/4] bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center">
+              <img src="/targets/isis-3-4.png" alt="Isis Target" className="w-full h-full object-contain" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
